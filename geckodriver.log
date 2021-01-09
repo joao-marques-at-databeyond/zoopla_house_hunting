@@ -1,0 +1,40 @@
+1610214167485	geckodriver	INFO	Listening on 127.0.0.1:57023
+1610214170525	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "C:\\Users\\joaom\\AppData\\Local\\Temp\\rust_mozprofilewy3lcv"
+*** You are running in headless mode.
+1610214174767	geckodriver	INFO	Listening on 127.0.0.1:57036
+1610214192423	geckodriver	INFO	Listening on 127.0.0.1:57087
+1610214195479	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "C:\\Users\\joaom\\AppData\\Local\\Temp\\rust_mozprofileUbBGx0"
+*** You are running in headless mode.
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1610214196901	Marionette	INFO	Listening on port 57095
+1610214197039	Marionette	WARN	TLS certificate errors will be ignored for this session
+1610214201631	Marionette	INFO	Stopped listening on port 57095
+1610214202791	geckodriver	INFO	Listening on 127.0.0.1:57180
+1610214205815	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "C:\\Users\\joaom\\AppData\\Local\\Temp\\rust_mozprofile1wa1qH"
+*** You are running in headless mode.
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1610214209736	Marionette	INFO	Listening on port 57191
+1610214210110	Marionette	WARN	TLS certificate errors will be ignored for this session
+1610214213173	Marionette	INFO	Stopped listening on port 57191
+JavaScript error: resource://gre/modules/UrlClassifierListManager.jsm, line 691: TypeError: this.tablesData[table] is undefined
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1610214216065	geckodriver	INFO	Listening on 127.0.0.1:57266
+1610214219123	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "C:\\Users\\joaom\\AppData\\Local\\Temp\\rust_mozprofileLNEMkA"
+*** You are running in headless mode.
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1610214222492	Marionette	INFO	Listening on port 57275
+1610214222884	Marionette	WARN	TLS certificate errors will be ignored for this session
+1610214227362	Marionette	INFO	Stopped listening on port 57275
+1610214228986	geckodriver	INFO	Listening on 127.0.0.1:57358
+1610214232011	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "C:\\Users\\joaom\\AppData\\Local\\Temp\\rust_mozprofilehmZqMB"
+*** You are running in headless mode.
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1610214237290	Marionette	INFO	Listening on port 57366
+1610214237459	Marionette	WARN	TLS certificate errors will be ignored for this session
+1610214241485	Marionette	INFO	Stopped listening on port 57366
+JavaScript error: resource://gre/modules/UrlClassifierListManager.jsm, line 691: TypeError: this.tablesData[table] is undefined
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+

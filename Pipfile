@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+geopy = "2.1.1"
+ratelimit = "2.2.1"
+bs4 = "0.0.1"
+selenium = "3.141.0"
+requests = "2.25.1"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
