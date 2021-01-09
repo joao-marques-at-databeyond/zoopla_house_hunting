@@ -13,8 +13,6 @@ pages = [
     {'link': 'www.zoopla.co.uk/for-sale/houses/kingston-vale/',
      'q': "Kingston Vale, London"}]
 
-
-
 ##################################
 # CODE
 
@@ -39,8 +37,11 @@ from selenium import webdriver
 from selenium.webdriver import FirefoxOptions
 from os import environ, path, curdir
 
-drivers_path = path.join(path.abspath(curdir),"drivers")
+drivers_path = path.join(path.abspath(curdir), "drivers")
 environ["PATH"] += drivers_path
+
+# will be needed for reverse geolocation
+locator = Nominatim(user_agent='myGeocoder')
 
 # @limits: making sure I don't DDOS Zoopla's website!
 @limits(calls=1, period=1)
@@ -54,7 +55,7 @@ def _get_webpage_soup(link, q, page_num):
     print(url)
     opts = FirefoxOptions()
     opts.add_argument("--headless")
-    driver = webdriver.Firefox(firefox_options=opts, executable_path=drivers_path+'/geckodriver')
+    driver = webdriver.Firefox(firefox_options=opts, executable_path=drivers_path + '/geckodriver')
     driver.get(str(url))
     soup = BeautifulSoup(driver.page_source)
     driver.close()
@@ -90,15 +91,11 @@ def get_main_page_listing(page_cnf):
             break
         _ids = _get_listing_ids(soup)
         list_ids += _ids
-
-        # If not found, break
         if len(_ids) == 0:
             print('Results are no more! Break after ', len(list_ids), ' records')
             break
-
         page += 1
         max_loop -= 1
-
     if max_loop == 0:
         raise Exception(f"Something is clearly wrong... can't have {mx_page}+ pages can it?")
 
@@ -136,67 +133,8 @@ def get_soup_text(soup_, type_, class_, char_erase=''):
             txt = txt.replace(ch, '')
         return txt
 
-
-list_ids = []
-been_there_done_that = set()
-start_time = time()
-for page_cnf in pages:
-    lap_time = time()
-    been_there_done_that = been_there_done_that.union(set([v for i, v in list_ids]))
-    print("$" * 40)
-    print('Getting', page_cnf["q"])
-    _retry = 0
-    while True:
-        _list = []
-        try:
-            _list += [i
-                      for i in get_main_page_listing(page_cnf)
-                      if i not in list_ids]
-            break
-        except Exception as e:
-            if _retry > 2:
-                raise e
-            print("That is unexpected...")
-            print(e)
-            sleep(2)
-            _retry += 1
-    list_ids += [(i, v)
-                 for i, v in _list
-                 if v not in been_there_done_that]
-    print(
-        f"You fast homey! {len(list_ids)} properties in {round(time() - lap_time, 1)}s (T: {round(time() - start_time, 2)})")
-    sleep(1)
-print(f"Done, got {len(list_ids)} houses to lookup")
-
-# # Get property data
-
-# In[4]:
-
-
-data = []
-TOTAL = len(list_ids)
-locator = Nominatim(user_agent='myGeocoder')
-
-i = 0
-
-# In[5]:
-
-
-start_time = time()
-for (location, property_id) in list_ids[max(i - 1, 0):]:
-    lap_time = time()
-    i += 1
-    url = urlunparse(['http',
-                      'www.zoopla.co.uk',
-                      f'for-sale/details/{property_id}',
-                      '',
-                      '',
-                      ''
-                      ])
-
-    soup = BeautifulSoup(requests.get(url).content, 'html')
-    print("Loading", url, f"{i} of {TOTAL}", end='')
-
+@limits(calls=3, period=1)
+def get_property_details(property_id, location, soup):
     house_data = dict({'id': property_id, 'location': location})
 
     # get price history
@@ -240,19 +178,66 @@ for (location, property_id) in list_ids[max(i - 1, 0):]:
             # reverse geolocation
             try:
                 location = locator.reverse(f"{house_data['lat']}, {house_data['long']}")
+                addr = location.raw.get('address')
+                if addr:
+                    house_data['road'] = addr.get('road')
+                    house_data['postcode'] = addr.get('postcode')
+                else:
+                    print('No address found on this one...')
+
             except TypeError:
-                print('TypeError: Failed to get an address!')
-                continue
-
-            add = location.raw.get('address')
-            if add:
-                house_data['road'] = add.get('road')
-                house_data['postcode'] = add.get('postcode')
-            else:
-                print('No address!')
-
+                print('Failed to get an address (but it is fine)')
         else:
-            print('Did not find map!')
+            print('Could not find map!')
+    return house_data
+
+
+list_ids = []
+been_there_done_that = set()
+start_time = time()
+for page_cnf in pages:
+    lap_time = time()
+    been_there_done_that = been_there_done_that.union(set([v for i, v in list_ids]))
+    print("$" * 40)
+    print('Getting', page_cnf["q"])
+    _retry = 0
+    while True:
+        _list = []
+        try:
+            _list += [i
+                      for i in get_main_page_listing(page_cnf)
+                      if i not in list_ids]
+            break
+        except Exception as e:
+            if _retry > 2:
+                raise e
+            print("That is unexpected...")
+            print(e)
+            sleep(2)
+            _retry += 1
+    list_ids += [(i, v)
+                 for i, v in _list
+                 if v not in been_there_done_that]
+    print(
+        f"You fast homey! {len(list_ids)} properties in {round(time() - lap_time, 1)}s (T: {round(time() - start_time, 2)})")
+    sleep(1)
+print(f"Done, got {len(list_ids)} houses to lookup")
+
+# Get property details
+data = []
+TOTAL = len(list_ids)
+
+i = 0
+start_time = time()
+for (location, property_id) in list_ids[max(i - 1, 0):]:
+    lap_time = time()
+    i += 1
+    url = urlunparse(['http', 'www.zoopla.co.uk', f'for-sale/details/{property_id}', '', '', ''])
+
+    soup = BeautifulSoup(requests.get(url).content, 'html')
+    print("Loading", url, f"{i} of {TOTAL}", end='')
+
+    house_data = get_property_details(property_id, location, soup)
 
     print(f" ( {round(time() - lap_time, 1)}s , T: {round(time() - start_time, 2)})")
     data += [house_data]
